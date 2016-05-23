@@ -35,7 +35,7 @@ int main(){
                 inFile.read((char*)&synchroBits3, 1);
                 if(synchroBits3 == 0x5F){
 
-                    std::cout << std::hex << (int)synchroBits1 << " " << std::hex << (int)synchroBits2 << " " << std::hex << (int)synchroBits3 << "\n";
+                   // std::cout << std::hex << (int)synchroBits1 << " " << std::hex << (int)synchroBits2 << " " << std::hex << (int)synchroBits3 << "\n";
 
                     unsigned short typeOfMessage = 0;
                     unsigned short sizeOfMessage = 0;
@@ -45,7 +45,6 @@ int main(){
                     inFile.seekg(11, inFile.cur);
 
                     if (typeOfMessage == 6){
-                        std::cout << typeOfMessage <<"\n";
                         float  r, p,y;
                         double lon,lat;
                         float height;
@@ -59,19 +58,18 @@ int main(){
                         inFile.read(as_bytes(&lon), sizeof(lon));
                         inFile.read(as_bytes(&height), sizeof(height));
 
-                        cout << p << endl;
-                        cout << r << endl;
-                        cout << y << endl;
+                        int countSignAngle = 5;
+                        int countSignCoordinate = 10;
 
-                        outFile << r << " ";
-                        outFile << p << " ";
-                        outFile << y << " ";
+                        outFile << fixed << setprecision(countSignAngle) << r << " ";
+                        outFile << fixed << setprecision(countSignAngle) << p << " ";
+                        outFile << fixed << setprecision(countSignAngle) <<y << " ";
 
-                        outFile << std::fixed <<lat << " ";
-                        outFile << std::fixed <<lon << " ";
-                        outFile << std::fixed <<height << " ";
+                        outFile << fixed << setprecision(countSignCoordinate) << lat << " ";
+                        outFile << fixed << setprecision(countSignCoordinate) << lon << " ";
+                        outFile << fixed << setprecision(countSignCoordinate) << height << " ";
                         outFile <<"\n";
-                        inFile.seekg(36 + 4, inFile.cur);// перерахувати
+                        inFile.seekg(36 + 4, inFile.cur);//зсув на кінець повідомлення
                     } else {
 
                     // correct comment must be here
@@ -83,5 +81,6 @@ int main(){
     }
     outFile.close();
     inFile.close();
+    cout << "Finish work! I did it!!!"<< "\n";
     return 0;
 }
