@@ -16,26 +16,28 @@ byte* as_bytes(T* ptr) {
 int main(){
     string
             wayInFile= "//home/buryi/NDU24.BIN",
-            wayOutFile = "//home//buryi//third.txt";
-
+            wayOutFile = "//home//buryi//third3.txt";
 
     ifstream inFile(wayInFile.c_str(), ifstream::binary);
     ofstream outFile(wayOutFile.c_str());
     while (inFile)
     {
-        unsigned char synchroBits1;
-        unsigned char synchroBits2;
-        unsigned char synchroBits3;
+        unsigned char synchroBits[3];
+        unsigned char synchroBitsKey[3];
+        //synchroBits
+        synchroBitsKey[0] = 0xFA;
+        synchroBitsKey[1]= 0x3C;
+        synchroBitsKey[2] = 0x5F;
         // reading the header
 
-        inFile.read((char*)&synchroBits1, 1);
-        if (synchroBits1 == 0xFA) {
-            inFile.read((char*)&synchroBits2, 1);
-            if (synchroBits2 == 0x3C){
-                inFile.read((char*)&synchroBits3, 1);
-                if(synchroBits3 == 0x5F){
-
-                   // std::cout << std::hex << (int)synchroBits1 << " " << std::hex << (int)synchroBits2 << " " << std::hex << (int)synchroBits3 << "\n";
+        inFile.read((char*)&synchroBits[0], 1);
+        if (synchroBits[0] != synchroBitsKey[0]){
+            continue;
+        } else {
+            inFile.read((char*)&synchroBits[1], 1);
+            if (synchroBits[1] == synchroBitsKey[1]){
+                inFile.read((char*)&synchroBits[2], 1);
+                if(synchroBits[2] == synchroBitsKey[2]){
 
                     unsigned short typeOfMessage = 0;
                     unsigned short sizeOfMessage = 0;
@@ -43,8 +45,8 @@ int main(){
                     inFile.read((char*)&typeOfMessage, 2);
                     inFile.read((char*)&sizeOfMessage, 2);
                     inFile.seekg(11, inFile.cur);
-
-                    if (typeOfMessage == 6){
+                    int  needMessageType = 6;
+                    if (typeOfMessage == needMessageType){
                         float  r, p,y;
                         double lon,lat;
                         float height;
@@ -60,24 +62,24 @@ int main(){
 
                         int countSignAngle = 5;
                         int countSignCoordinate = 10;
+                        outFile << fixed << setprecision(countSignAngle);
+                        outFile << r << " ";
+                        outFile << p << " ";
+                        outFile <<y << " ";
 
-                        outFile << fixed << setprecision(countSignAngle) << r << " ";
-                        outFile << fixed << setprecision(countSignAngle) << p << " ";
-                        outFile << fixed << setprecision(countSignAngle) <<y << " ";
-
-                        outFile << fixed << setprecision(countSignCoordinate) << lat << " ";
-                        outFile << fixed << setprecision(countSignCoordinate) << lon << " ";
-                        outFile << fixed << setprecision(countSignCoordinate) << height << " ";
+                        outFile << fixed << setprecision(countSignCoordinate);
+                        outFile << lat << " ";
+                        outFile << lon << " ";
+                        outFile << height << " ";
                         outFile <<"\n";
                         inFile.seekg(36 + 4, inFile.cur);//зсув на кінець повідомлення
                     } else {
 
-                    // correct comment must be here
-                    inFile.seekg(sizeOfMessage + 4, inFile.cur);}
+                        // correct comment must be here
+                        inFile.seekg(sizeOfMessage + 4, inFile.cur);}
                 }
             }
         }
-
     }
     outFile.close();
     inFile.close();
